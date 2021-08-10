@@ -1,6 +1,6 @@
 {
   "name": "react-datagrid-v2",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "homepage": "https://github.com/mohammadtz/react-datagrid-v2",
   "peerDependencies": {
     "@testing-library/jest-dom": "^5.11.4",
@@ -13,7 +13,6 @@
     "web-vitals": "^1.0.1"
   },
   "scripts": {
-    "build-sass": "sass --watch src/components/DataGrid.scss src/components/DataGrid.css",
     "build": "tsc"
   },
   "dependencies": {

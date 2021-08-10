@@ -68,10 +68,15 @@ export function DataGrid<T = any>(props: IProps<T>) {
   const rows = () => props.dataSource?.map((_, index) => renderRow(index));
 
   /** render all columns in data-grid */
-  const columns = (element: IElement, renderData: boolean, index?: number) =>
-    props.columns?.map((column, i) =>
-      renderColumn(element, column, index !== undefined ? index : i, renderData)
-    );
+  const columns = (element: IElement, renderData: boolean, index: number = 0) =>
+    props.columns
+      ? props.columns.map((column, i) =>
+          renderColumn(element, column, index !== undefined ? index : i, renderData)
+        )
+      : props.dataSource &&
+        Object.keys(props.dataSource[index]).map((key, i) => {
+          return renderColumn(element, key as keyof T, index !== undefined ? index : i, renderData);
+        });
 
   return (
     <Table {...props}>

@@ -1,8 +1,13 @@
-import styled from "styled-components";
+import styled, { css } from "styled-components";
+import { colors } from "./colors";
+import { ITable } from "./StyledComponents.type";
 
-export const Table = styled.table`
+const main_border = `1px solid ${colors.border}`;
+
+export const Table = styled.table<ITable>`
   width: 100%;
   border-collapse: collapse;
+  border: ${(props) => props.showBorder && main_border};
   thead {
     tr {
       border-bottom: 2px solid #ddd;
@@ -15,55 +20,42 @@ export const Table = styled.table`
     tr {
       td {
         height: 1.8rem;
+        border-bottom: ${(props) => props.showRowLines && main_border};
+      }
+      &:nth-child(even) {
+        background-color: ${(props) => props.rowAlternationEnabled && colors.rowAlternation};
       }
     }
   }
-  &.show-border {
-    border: 1px solid #ddd;
-  }
-  &.show-row-lines {
-    thead,
-    tbody {
-      tr {
-        th,
-        td {
-          border-bottom: 1px solid #ddd;
-        }
-      }
-    }
-  }
-  &.show-column-lines {
-    thead,
-    tbody {
-      tr {
-        th,
-        td {
-          border-right: 1px solid #ddd;
-          &:first-child {
-            border-right: none;
+  ${(props) =>
+    props.showColumnLines &&
+    css`
+      thead,
+      tbody {
+        tr {
+          th,
+          td {
+            border-right: ${main_border};
+            &:first-child {
+              border-right: none;
+            }
           }
         }
       }
-    }
-  }
-  &.row-alternation-enabled {
-    tbody {
-      tr {
-        &:nth-child(even) {
-          background-color: #f5f5f5;
+    `}
+  ${(props) =>
+    props.sortable &&
+    css`
+      .show-sort {
+        position: relative;
+        cursor: pointer;
+        .sort-icon {
+          position: absolute;
+          right: 0.5rem;
+          top: 50%;
+          margin-top: -0.5rem;
+          color: ${colors.border};
         }
       }
-    }
-  }
-  .show-sort {
-    position: relative;
-    cursor: pointer;
-    .sort-icon {
-      position: absolute;
-      right: 0.5rem;
-      top: 50%;
-      margin-top: -0.5rem;
-      color: #ddd;
-    }
-  }
+    `}
 `;

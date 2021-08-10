@@ -73,16 +73,8 @@ export function DataGrid<T = any>(props: IProps<T>) {
       renderColumn(element, column, index !== undefined ? index : i, renderData)
     );
 
-  // dynamic class names
-  const showBorder = props.showBorder ? "show-border" : "";
-  const showRowLines = props.showRowLines ? "show-row-lines" : "";
-  const showColumnLines = props.showRowLines ? "show-column-lines" : "";
-  const rowAlternationEnabled = props.rowAlternationEnabled ? "row-alternation-enabled" : "";
-
   return (
-    <Table
-      className={`react-data-grid ${showBorder} ${showRowLines} ${showColumnLines} ${rowAlternationEnabled}`}
-    >
+    <Table {...props}>
       <thead>
         <tr>{columns("th", false)}</tr>
       </thead>

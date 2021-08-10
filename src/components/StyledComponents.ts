@@ -1,11 +1,6 @@
-.border-columns {
-  border-right: 1px solid #ddd;
-  &:first-child {
-    border-right: none;
-  }
-}
+import styled from "styled-components";
 
-.react-data-grid {
+export const Table = styled.table`
   width: 100%;
   border-collapse: collapse;
   thead {
@@ -43,7 +38,10 @@
       tr {
         th,
         td {
-          @extend .border-columns;
+          border-right: 1px solid #ddd;
+          &:first-child {
+            border-right: none;
+          }
         }
       }
     }
@@ -68,4 +66,4 @@
       color: #ddd;
     }
   }
-}
+`;

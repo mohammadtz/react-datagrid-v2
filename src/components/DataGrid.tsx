@@ -1,9 +1,9 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { ReactNode, useState, useEffect } from "react";
 import { IProps, IElement, IColumn, ISort } from "./DataGrid.type";
-import "./DataGrid.scss";
 import { HiOutlineArrowNarrowDown, HiOutlineArrowNarrowUp } from "react-icons/hi";
 import { v4 as uuidv4 } from "uuid";
+import { Table } from "./StyledComponents";
 
 export function DataGrid<T = any>(props: IProps<T>) {
   const [sort, setSort] = useState<ISort<T>>();
@@ -80,7 +80,7 @@ export function DataGrid<T = any>(props: IProps<T>) {
   const rowAlternationEnabled = props.rowAlternationEnabled ? "row-alternation-enabled" : "";
 
   return (
-    <table
+    <Table
       className={`react-data-grid ${showBorder} ${showRowLines} ${showColumnLines} ${rowAlternationEnabled}`}
     >
       <thead>
@@ -88,7 +88,7 @@ export function DataGrid<T = any>(props: IProps<T>) {
       </thead>
       <tbody>{rows()}</tbody>
       <tfoot></tfoot>
-    </table>
+    </Table>
   );
 }
 

@@ -4,4 +4,5 @@ export interface ITable {
   showColumnLines?: boolean;
   rowAlternationEnabled?: boolean;
   sortable?: boolean;
+  maxHeight?: string | number;
 }

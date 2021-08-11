@@ -1,6 +1,7 @@
 import { ReactNode } from "react";
+import { ITable } from "./StyledComponents.type";
 
-export interface IProps<T = any> {
+export interface IProps<T = any> extends ITable {
   /**
    ** columns: declare how to render and show datagrid columns
    ** for example:
@@ -36,11 +37,6 @@ export interface IProps<T = any> {
    * ```
    */
   dataSource?: T[];
-  showBorder?: boolean;
-  showRowLines?: boolean;
-  showColumnLines?: boolean;
-  rowAlternationEnabled?: boolean;
-  sortable?: boolean;
   handleSort?: (e: ISort<T>) => void;
 }
 

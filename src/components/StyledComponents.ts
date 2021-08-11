@@ -1,4 +1,5 @@
 import styled, { css } from "styled-components";
+import { getScrollbarWidth, trueUnit } from "../utils/utils";
 import { colors } from "./colors";
 import { ITable } from "./StyledComponents.type";
 
@@ -8,7 +9,16 @@ export const Table = styled.table<ITable>`
   width: 100%;
   border-collapse: collapse;
   border: ${(props) => props.showBorder && main_border};
+
+  & thead,
+  & tbody tr {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+  }
+
   thead {
+    width: ${(props) => (props.maxHeight ? `calc(100% - ${`${getScrollbarWidth()}px`})` : "100%")};
     tr {
       border-bottom: 2px solid #ddd;
       th {
@@ -16,7 +26,11 @@ export const Table = styled.table<ITable>`
       }
     }
   }
+
   tbody {
+    display: block;
+    max-height: ${(props) => trueUnit(props.maxHeight)};
+    overflow-y: auto;
     tr {
       td {
         height: 1.8rem;
@@ -27,6 +41,7 @@ export const Table = styled.table<ITable>`
       }
     }
   }
+
   ${(props) =>
     props.showColumnLines &&
     css`
@@ -43,6 +58,7 @@ export const Table = styled.table<ITable>`
         }
       }
     `}
+
   ${(props) =>
     props.sortable &&
     css`

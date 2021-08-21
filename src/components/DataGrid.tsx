@@ -1,16 +1,45 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { ReactNode, useState, useEffect } from "react";
-import { IProps, IElement, IColumn, ISort } from "./DataGrid.type";
+import React, { ReactNode, useState, useEffect, useRef } from "react";
+import { IProps, IElement, IColumn, ISort, IFilter } from "./DataGrid.type";
 import { HiOutlineArrowNarrowDown, HiOutlineArrowNarrowUp } from "react-icons/hi";
 import { v4 as uuidv4 } from "uuid";
-import { Table } from "./StyledComponents";
+import { StyledTable } from "./StyledComponents";
+import { ColumnSearch } from "./ColumnSearch";
+import { checkHasValue, getKey, scrollbarVisible } from "../utils/utils";
+import { renderMessage } from "../localization/render";
 
 export function DataGrid<T = any>(props: IProps<T>) {
+  const tbodyRef = useRef<HTMLTableSectionElement>(null);
+
+  const [visibleScrollbar, setVisibleScrollbar] = useState(false);
   const [sort, setSort] = useState<ISort<T>>();
+  const [filters, setFilters] = useState<IFilter<T>[]>([]);
+
+  const message = renderMessage(props.localization);
 
   useEffect(() => {
     if (sort && props.handleSort) props.handleSort(sort);
   }, [sort]);
+
+  useEffect(() => {
+    if (filters && props.handleRowFilter) {
+      props.handleRowFilter(filters.filter((x) => checkHasValue(x.value)));
+      setTimeout(() => {
+        if (tbodyRef.current) {
+          setVisibleScrollbar(scrollbarVisible(tbodyRef.current));
+        }
+      }, 50);
+    }
+  }, [filters]);
+
+  useEffect(() => {
+    console.log("scrollbarVisible", visibleScrollbar);
+  }, [visibleScrollbar]);
+
+  useEffect(() => {
+    tbodyRef.current?.addEventListener("scroll", scroll);
+    return () => tbodyRef.current?.removeEventListener("scroll", scroll);
+  }, [tbodyRef.current?.scrollTop]);
 
   /** declare columnBySort */
   const renderColBySort = (key: keyof T, children: ReactNode) => {
@@ -41,11 +70,15 @@ export function DataGrid<T = any>(props: IProps<T>) {
     const key: keyof T | undefined = col_obj?.dataField || col_key;
 
     if (renderData && data && key) {
+      if (col_obj?.dataType === "boolean") {
+        const checkBox = <input type="checkbox" readOnly checked={Boolean(data[key])} />;
+        return col_obj?.customRender ? col_obj.customRender(data) : checkBox;
+      }
       return col_obj?.customRender ? col_obj.customRender(data) : data[key];
     } else {
       const children = col_obj?.caption || col_obj?.dataField || col_key;
 
-      return props.showBorder && key ? renderColBySort(key, children) : children;
+      return props.visibleBorder && key ? renderColBySort(key, children) : children;
     }
   };
 
@@ -78,14 +111,55 @@ export function DataGrid<T = any>(props: IProps<T>) {
           return renderColumn(element, key as keyof T, index !== undefined ? index : i, renderData);
         });
 
+  const renderSummary = () => {
+    return <></>;
+  };
+
+  const handleFilterChange = (e?: IFilter<T>) => {
+    const temp = [...filters];
+
+    if (temp?.find((x) => x.key === e?.key)) {
+      const index = temp.findIndex((x) => x.key === e?.key);
+      temp && e && (temp[index] = { ...e });
+    } else {
+      e && e.value !== null && temp.push({ ...e });
+    }
+
+    setFilters(temp);
+  };
+
+  const renderColumnsSearch = props.columns?.map((column, index) => {
+    return typeof getKey(column) === "string" ? (
+      <td key={uuidv4()}>
+        <ColumnSearch
+          column={column}
+          data={filters.find((x) => x.key === getKey(column))}
+          onSubmit={handleFilterChange}
+          index={index}
+          message={message}
+        />
+      </td>
+    ) : (
+      <td key={uuidv4()}></td>
+    );
+  });
+
+  const scroll = () => {
+    const tbody = tbodyRef.current;
+
+    if (tbody && tbody.offsetHeight + tbody.scrollTop >= tbody.scrollHeight)
+      props.scrolledToBottom && props.scrolledToBottom();
+  };
+
   return (
-    <Table {...props}>
+    <StyledTable {...props} hasScrolbar={visibleScrollbar}>
       <thead>
         <tr>{columns("th", false)}</tr>
+        {props.columnSearch && <tr>{renderColumnsSearch}</tr>}
       </thead>
-      <tbody>{rows()}</tbody>
-      <tfoot></tfoot>
-    </Table>
+      <tbody ref={tbodyRef}>{rows()}</tbody>
+      <tfoot>{renderSummary()}</tfoot>
+    </StyledTable>
   );
 }
 

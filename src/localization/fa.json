@@ -1,0 +1,9 @@
+{
+  "select_filter_type_contain": "شامل",
+  "select_filter_type_equal": "تساوی",
+  "select_filter_type_start_with": "شروع با",
+  "select_filter_type_end_with": "پایان با",
+  "select_boolean_all": "همه",
+  "select_boolean_true": "فعال",
+  "select_boolean_false": "غیر فعال"
+}

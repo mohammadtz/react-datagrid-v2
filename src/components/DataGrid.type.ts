@@ -1,4 +1,5 @@
 import { ReactNode } from "react";
+import { ILocalization } from "../localization/render";
 import { ITable } from "./StyledComponents.type";
 
 export interface IProps<T = any> extends ITable {
@@ -38,6 +39,10 @@ export interface IProps<T = any> extends ITable {
    */
   dataSource?: T[];
   handleSort?: (e: ISort<T>) => void;
+  columnSearch?: boolean;
+  handleRowFilter?: (e: IFilter<T>[]) => void;
+  localization?: ILocalization;
+  scrolledToBottom?: () => void;
 }
 
 export interface IColumn<T = any> {
@@ -66,6 +71,7 @@ export interface IColumn<T = any> {
   dataField?: keyof T;
   caption?: string;
   customRender?: (data: T) => ReactNode;
+  dataType?: IDataType;
 }
 
 export type IElement = "th" | "td";
@@ -74,3 +80,18 @@ export interface ISort<T> {
   key: keyof T;
   desc?: boolean;
 }
+
+export interface IFilter<T> {
+  key?: keyof T;
+  value?: string | number | boolean | null;
+  type: FilterType;
+}
+
+export enum FilterType {
+  contain = 1,
+  equal,
+  startWith,
+  endWith,
+}
+
+export type IDataType = "boolean" | "number" | "string";

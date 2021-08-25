@@ -24,6 +24,7 @@ yarn-error.log*
 
 /components
 /utils
+/localization
 index.js
 index.d.ts
 

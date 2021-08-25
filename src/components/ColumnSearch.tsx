@@ -65,7 +65,7 @@ export function ColumnSearch<T>(props: IColumnSearch<T>) {
       <>
         <input value={temptValue?.toString()} onChange={(e) => onChangeInput(e.target.value)} />
         <SelectFilterType {...props} onFilterType={(e) => setType(e)} data={props.data} />
-        <button>
+        <button style={{ paddingInlineEnd: 6, paddingInlineStart: 2 }}>
           <HiSearch fontSize={"1.6rem"} color={colors.border} />
         </button>
       </>

@@ -2,7 +2,7 @@ import { ReactNode } from "react";
 import { ILocalization } from "../localization/render";
 import { ITable } from "./StyledComponents.type";
 
-export interface IProps<T = any> extends ITable {
+export interface IDataGrid<T = any> extends ITable {
   /**
    ** columns: declare how to render and show datagrid columns
    ** for example:
@@ -43,6 +43,8 @@ export interface IProps<T = any> extends ITable {
   handleRowFilter?: (e: IFilter<T>[]) => void;
   localization?: ILocalization;
   scrolledToBottom?: () => void;
+  style?: React.CSSProperties;
+  className?: string;
 }
 
 export interface IColumn<T = any> {
@@ -72,6 +74,7 @@ export interface IColumn<T = any> {
   caption?: string;
   customRender?: (data: T) => ReactNode;
   dataType?: IDataType;
+  width?: string | number;
 }
 
 export type IElement = "th" | "td";

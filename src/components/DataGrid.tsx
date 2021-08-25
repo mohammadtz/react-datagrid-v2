@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { ReactNode, useState, useEffect, useRef } from "react";
-import { IProps, IElement, IColumn, ISort, IFilter } from "./DataGrid.type";
+import { IDataGrid, IElement, IColumn, ISort, IFilter } from "./DataGrid.type";
 import { HiOutlineArrowNarrowDown, HiOutlineArrowNarrowUp } from "react-icons/hi";
 import { v4 as uuidv4 } from "uuid";
 import { StyledTable } from "./StyledComponents";
@@ -8,7 +8,9 @@ import { ColumnSearch } from "./ColumnSearch";
 import { checkHasValue, getKey, scrollbarVisible } from "../utils/utils";
 import { renderMessage } from "../localization/render";
 
-export function DataGrid<T = any>(props: IProps<T>) {
+const defaultProps: IDataGrid = { colorSchema: { primary: "#1abc9c" } };
+
+export function DataGrid<T = any>(props: IDataGrid<T> = defaultProps) {
   const tbodyRef = useRef<HTMLTableSectionElement>(null);
 
   const [visibleScrollbar, setVisibleScrollbar] = useState(false);
@@ -31,10 +33,6 @@ export function DataGrid<T = any>(props: IProps<T>) {
       }, 50);
     }
   }, [filters]);
-
-  useEffect(() => {
-    console.log("scrollbarVisible", visibleScrollbar);
-  }, [visibleScrollbar]);
 
   useEffect(() => {
     tbodyRef.current?.addEventListener("scroll", scroll);
@@ -63,7 +61,8 @@ export function DataGrid<T = any>(props: IProps<T>) {
   const renderChildren = (
     renderData?: boolean,
     data?: T,
-    column?: IColumn<T> | keyof T
+    column?: IColumn<T> | keyof T,
+    element?: IElement
   ): ReactNode => {
     const col_obj = column as IColumn<T> | undefined;
     const col_key = column as keyof T | undefined;
@@ -72,13 +71,33 @@ export function DataGrid<T = any>(props: IProps<T>) {
     if (renderData && data && key) {
       if (col_obj?.dataType === "boolean") {
         const checkBox = <input type="checkbox" readOnly checked={Boolean(data[key])} />;
-        return col_obj?.customRender ? col_obj.customRender(data) : checkBox;
+        if (element !== "th")
+          return (
+            <div className="border">
+              {" "}
+              {col_obj?.customRender ? col_obj.customRender(data) : checkBox}
+            </div>
+          );
+        else return col_obj?.customRender ? col_obj.customRender(data) : checkBox;
       }
-      return col_obj?.customRender ? col_obj.customRender(data) : data[key];
+      if (element !== "th")
+        return (
+          <div className="border">
+            {" "}
+            {col_obj?.customRender ? col_obj.customRender(data) : data[key]}
+          </div>
+        );
+      else return col_obj?.customRender ? col_obj.customRender(data) : data[key];
     } else {
       const children = col_obj?.caption || col_obj?.dataField || col_key;
-
-      return props.visibleBorder && key ? renderColBySort(key, children) : children;
+      if (element !== "th")
+        return (
+          <div className="border">
+            {" "}
+            {props.visibleBorder && key ? renderColBySort(key, children) : children}
+          </div>
+        );
+      else return props.visibleBorder && key ? renderColBySort(key, children) : children;
     }
   };
 
@@ -89,13 +108,32 @@ export function DataGrid<T = any>(props: IProps<T>) {
     index: number,
     renderData?: boolean
   ) => {
+    const col_obj = column as IColumn<T> | undefined;
     const data = props.dataSource && props.dataSource[index];
-    let children = renderChildren(renderData, data, column);
-    return React.createElement(element, { key: uuidv4() }, children);
+    let children = renderChildren(renderData, data, column, element);
+    return React.createElement(
+      element,
+      { key: uuidv4(), style: { width: col_obj?.width } },
+      children
+    );
   };
 
+  const handleSingleSelection = (index: number) => {};
+  const handleMultipleSelection = (index: number) => {};
+
   /** render single row of data-grid */
-  const renderRow = (index: number) => <tr key={uuidv4()}>{columns("td", true, index)}</tr>;
+  const renderRow = (index: number) => {
+    let onRowClick = (index: number) => {};
+
+    if (props.selectionMode === "single") onRowClick = handleSingleSelection;
+    else if (props.selectionMode === "multiple") onRowClick = handleMultipleSelection;
+
+    return (
+      <tr key={uuidv4()} onClick={() => onRowClick(index)}>
+        {columns("td", true, index)}
+      </tr>
+    );
+  };
 
   /** render all row in data-grid */
   const rows = () => props.dataSource?.map((_, index) => renderRow(index));
@@ -129,8 +167,9 @@ export function DataGrid<T = any>(props: IProps<T>) {
   };
 
   const renderColumnsSearch = props.columns?.map((column, index) => {
+    const col_obj = column as IColumn<T> | undefined;
     return typeof getKey(column) === "string" ? (
-      <td key={uuidv4()}>
+      <td key={uuidv4()} style={{ width: col_obj?.width }}>
         <ColumnSearch
           column={column}
           data={filters.find((x) => x.key === getKey(column))}
@@ -140,7 +179,7 @@ export function DataGrid<T = any>(props: IProps<T>) {
         />
       </td>
     ) : (
-      <td key={uuidv4()}></td>
+      <td key={uuidv4()} style={{ width: col_obj?.width }}></td>
     );
   });
 
@@ -155,7 +194,7 @@ export function DataGrid<T = any>(props: IProps<T>) {
     <StyledTable {...props} hasScrolbar={visibleScrollbar}>
       <thead>
         <tr>{columns("th", false)}</tr>
-        {props.columnSearch && <tr>{renderColumnsSearch}</tr>}
+        {props.columnSearch && <tr style={{ backgroundColor: "white" }}>{renderColumnsSearch}</tr>}
       </thead>
       <tbody ref={tbodyRef}>{rows()}</tbody>
       <tfoot>{renderSummary()}</tfoot>

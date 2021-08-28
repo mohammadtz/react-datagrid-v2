@@ -2,6 +2,11 @@ import { ReactNode } from "react";
 import { ILocalization } from "../localization/render";
 import { ITable } from "./StyledComponents.type";
 
+export interface IOnSelectionChanged<T> {
+  selectedRow?: T;
+  selectedRows?: T[];
+}
+
 export interface IDataGrid<T = any> extends ITable {
   /**
    ** columns: declare how to render and show datagrid columns
@@ -45,6 +50,7 @@ export interface IDataGrid<T = any> extends ITable {
   scrolledToBottom?: () => void;
   style?: React.CSSProperties;
   className?: string;
+  onSelectionChanged?: (e: IOnSelectionChanged<T>) => void;
 }
 
 export interface IColumn<T = any> {
@@ -72,7 +78,7 @@ export interface IColumn<T = any> {
    */
   dataField?: keyof T;
   caption?: string;
-  customRender?: (data: T) => ReactNode;
+  customRender?: (data: T, index: number) => ReactNode;
   dataType?: IDataType;
   width?: string | number;
 }

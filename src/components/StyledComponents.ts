@@ -4,6 +4,7 @@ import { colors } from "../utils/colors";
 import { ITable } from "./StyledComponents.type";
 
 const main_border = `1px solid ${colors.border}`;
+const selectedBorder = `1px solid ${colors.secondary}`;
 
 export const StyledTable = styled.table<ITable>`
   width: 100%;
@@ -11,7 +12,9 @@ export const StyledTable = styled.table<ITable>`
   border: ${(props) => props.visibleBorder && main_border};
   direction: ${(props) => (props.localization === "fa" ? "rtl" : "ltr")};
   height: ${(props) => trueUnit(props.height)};
-  border:none;
+  transition: 0.3s all;
+  border-collapse: separate;
+  border: none;
   & thead,
   & tbody tr {
     display: table;
@@ -22,7 +25,9 @@ export const StyledTable = styled.table<ITable>`
 
   thead {
     width: ${(props) =>
-    (props.maxHeight || props.height) && props.hasScrolbar ? `calc(100% - ${`${getScrollbarWidth()}px`})` : "100%"};
+      (props.maxHeight || props.height) && props.hasScrolbar
+        ? `calc(100% - ${`${getScrollbarWidth()}px`})`
+        : "100%"};
     margin-bottom: 8px;
     border-radius: 4px;
     display: block;
@@ -57,12 +62,12 @@ export const StyledTable = styled.table<ITable>`
       }
     }
   }
-  thead tr td{
-      :last-child {
-       form{
-         border-inline-end: none;
-       }
-        }
+  thead tr td {
+    :last-child {
+      form {
+        border-inline-end: none;
+      }
+    }
   }
 
   tbody {
@@ -91,6 +96,16 @@ export const StyledTable = styled.table<ITable>`
           }
         }
       }
+    }
+  }
+
+  .selected-border {
+    border: ${selectedBorder};
+    & > td:last-child {
+      border-radius: 10px 0 0 10px;
+    }
+    & > td:first-child {
+      border-radius: 0 10px 10px 0;
     }
   }
 
@@ -130,6 +145,7 @@ export const StyledColumnSearch = styled.form`
   width: 100%;
   align-items: center;
   border-inline-end: 1px solid #cdcfd4;
+  height: 31px;
 
   input {
     width: 100%;

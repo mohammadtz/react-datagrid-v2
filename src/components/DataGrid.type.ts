@@ -1,5 +1,6 @@
 import { ReactNode } from "react";
 import { ILocalization } from "../localization/render";
+import { Paths } from "../utils/types";
 import { ITable } from "./StyledComponents.type";
 
 export interface IOnSelectionChanged<T> {
@@ -26,7 +27,7 @@ export interface IDataGrid<T = any> extends ITable {
    * ```
    * ...
    */
-  columns?: (IColumn<T> | keyof T)[];
+  columns?: IColumn<T>[];
   /**
    * * dataSoure: declare data of data-grid
    * * for example:
@@ -44,13 +45,12 @@ export interface IDataGrid<T = any> extends ITable {
    */
   dataSource?: T[];
   handleSort?: (e: ISort<T>) => void;
-  columnSearch?: boolean;
-  handleRowFilter?: (e: IFilter<T>[]) => void;
+  handleRowFilter?: (e: FilterParams<T>[]) => void;
   localization?: ILocalization;
   scrolledToBottom?: () => void;
   style?: React.CSSProperties;
   className?: string;
-  onSelectionChanged?: (e: IOnSelectionChanged<T>) => void;
+  handleSelectionChanged?: (e: IOnSelectionChanged<T>) => void;
 }
 
 export interface IColumn<T = any> {
@@ -76,7 +76,7 @@ export interface IColumn<T = any> {
    * ]}
    * ```
    */
-  dataField?: keyof T;
+  dataField?: Paths<T, 2>;
   caption?: string;
   customRender?: (data: T, index: number) => ReactNode;
   dataType?: IDataType;
@@ -86,21 +86,35 @@ export interface IColumn<T = any> {
 export type IElement = "th" | "td";
 
 export interface ISort<T> {
-  key: keyof T;
+  key?: Paths<T, 2>;
   desc?: boolean;
 }
 
-export interface IFilter<T> {
-  key?: keyof T;
-  value?: string | number | boolean | null;
-  type: FilterType;
+export interface FilterParams<T> {
+  ColumnName?: Paths<T, 2>;
+  FilterValue?: string | number | boolean | null;
+  FilterOptions: FilterOptions;
 }
 
-export enum FilterType {
-  contain = 1,
-  equal,
-  startWith,
-  endWith,
+export enum FilterOptions {
+  StartsWith = 1,
+  EndsWith,
+  Contains,
+  DoesNotContain,
+  IsEmpty,
+  IsNotEmpty,
+  IsGreaterThan,
+  IsGreaterThanOrEqualTo,
+  IsLessThan,
+  IsLessThanOrEqualTo,
+  IsEqualTo,
+  IsNotEqualTo,
 }
 
 export type IDataType = "boolean" | "number" | "string";
+
+export interface IFilterTypeData {
+  id: FilterOptions;
+  text: string;
+  active: boolean;
+}

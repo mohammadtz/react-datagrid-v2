@@ -3,23 +3,33 @@ import { colorOp, getScrollbarWidth, trueUnit } from "../utils/utils";
 import { colors } from "../utils/colors";
 import { ITable } from "./StyledComponents.type";
 
-const main_border = `1px solid ${colors.border}`;
-const selectedBorder = `1px solid ${colors.secondary}`;
+export const main_border = `1px solid ${colors.border}`;
+export const selectedBorder = `1px solid ${colors.secondary}`;
+export const selectRowSize = "1px";
+
+export const borderRadiusRow = (isEnd?: boolean) => {
+  let value = "0 4px 4px 0";
+  if (isEnd) value = "4px 0 0 4px";
+  return {
+    "border-radius": value,
+  };
+};
 
 export const StyledTable = styled.table<ITable>`
   width: 100%;
-  border-collapse: collapse;
-  border: ${(props) => props.visibleBorder && main_border};
   direction: ${(props) => (props.localization === "fa" ? "rtl" : "ltr")};
   height: ${(props) => trueUnit(props.height)};
   transition: 0.3s all;
-  border-collapse: separate;
-  border: none;
-  & thead,
-  & tbody tr {
+  border-collapse: collapse;
+
+  thead tr,
+  tbody tr {
     display: table;
     width: 100%;
     table-layout: fixed;
+  }
+
+  tbody tr {
     cursor: ${(props) => (props.selectionMode === "single" ? "pointer" : undefined)};
   }
 
@@ -29,18 +39,12 @@ export const StyledTable = styled.table<ITable>`
         ? `calc(100% - ${`${getScrollbarWidth()}px`})`
         : "100%"};
     margin-bottom: 8px;
-    border-radius: 4px;
     display: block;
     tr {
-      // border-bottom: 2px solid #ddd;
-      display: table;
-      width: 100%;
-      table-layout: fixed;
-      background-color: #e1e1e1;
-      border-radius: 4px;
-      height: 50px;
+      height: 3rem;
       margin-bottom: 8px;
       th {
+        background-color: ${colors.theadBgColor};
         height: 2.2rem;
         font-weight: 400;
         div {
@@ -51,21 +55,17 @@ export const StyledTable = styled.table<ITable>`
           justify-content: center;
         }
         :last-child {
-          border-radius: 4px 0 0 4px;
           div {
             border-inline-end: none;
           }
         }
-        :nth-child(1) {
-          border-radius: 4px;
-        }
       }
-    }
-  }
-  thead tr td {
-    :last-child {
-      form {
-        border-inline-end: none;
+      td {
+        :last-child {
+          form {
+            border-inline-end: none;
+          }
+        }
       }
     }
   }
@@ -76,13 +76,13 @@ export const StyledTable = styled.table<ITable>`
     height: calc(100% - 116px);
     overflow-y: auto;
     tr {
-      background-color: #f4f4f4;
       margin-bottom: 8px;
       border-radius: 4px;
       height: 50px;
       td {
+        background-color: ${colors.rowColor};
         height: 1.8rem;
-        // border-bottom: ${(props) => props.visibleRowLines && main_border};
+        border: none;
         .border {
           border-inline-end: 1px solid #cdcfd4;
           height: 60%;
@@ -91,6 +91,9 @@ export const StyledTable = styled.table<ITable>`
           justify-content: center;
         }
         :last-child {
+          div {
+            border-inline-end: none;
+          }
           .border {
             border-inline-end: none;
           }
@@ -99,29 +102,71 @@ export const StyledTable = styled.table<ITable>`
     }
   }
 
+  .td-inner {
+    height: 100%;
+    background-color: ${colors.rowColor};
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
   .selected-border {
-    border: ${selectedBorder};
-    & > td:last-child {
-      border-radius: 10px 0 0 10px;
-    }
-    & > td:first-child {
-      border-radius: 0 10px 10px 0;
+    td {
+      background-color: ${colors.secondary};
+      padding-top: ${selectRowSize};
+      padding-bottom: ${selectRowSize};
+      :first-child {
+        background-color: ${(props) =>
+          props.selectionMode === "multiple" ? "transparent" : undefined};
+        padding-inline-start: ${(props) =>
+          props.selectionMode !== "multiple" ? selectRowSize : undefined};
+        .td-inner {
+          ${(props) => (props.selectionMode !== "multiple" ? borderRadiusRow() : undefined)}
+        }
+      }
+      :nth-child(2) {
+        padding-inline-start: ${(props) =>
+          props.selectionMode === "multiple" ? selectRowSize : undefined};
+        .td-inner {
+          ${(props) => (props.selectionMode === "multiple" ? borderRadiusRow() : undefined)}
+        }
+      }
+      :last-child {
+        padding-inline-end: ${selectRowSize};
+        .td-inner {
+          ${(props) => (props.selectionMode === "multiple" ? borderRadiusRow(true) : undefined)}
+        }
+      }
     }
   }
 
-  ${(props) =>
-    props.visibleColumnLines &&
-    css`
-      thead,
-      tbody {
-        tr {
-          th,
-          td {
-            /* border-inline-end: ${main_border}; */
-          }
-        }
+  tr {
+    td,
+    th {
+      :last-child {
+        ${borderRadiusRow(true)};
       }
-    `}
+      :first-child {
+        ${(props) =>
+          (props.selectionMode !== "multiple" || !props.selectionMode) && borderRadiusRow()};
+        ${(props) =>
+          props.selectionMode === "multiple" &&
+          css`
+            ${borderRadiusRow()}
+            background-color: transparent;
+          `};
+      }
+      :nth-child(2) {
+        ${(props) => props.selectionMode === "multiple" && borderRadiusRow()};
+      }
+    }
+  }
+
+  .column-search {
+    td {
+      background-color: white;
+    }
+  }
 
   ${(props) =>
     props.sortable &&
@@ -134,7 +179,7 @@ export const StyledTable = styled.table<ITable>`
           right: 0.5rem;
           top: 50%;
           margin-top: -0.5rem;
-          color: ${colors.border};
+          color: ${colors.gray};
         }
       }
     `}
@@ -174,10 +219,12 @@ export const StyledSelectFilterType = styled.div`
     /* left: 0; */
     background-color: ${colors.white};
     box-shadow: 2px 2px 5px 3px ${colorOp(colors.black, "15%")};
-    min-width: 6rem;
+    min-width: 7rem;
     display: flex;
     flex-direction: column;
     text-align: start;
+    max-height: 10rem;
+    overflow-y: auto;
     & > div {
       padding-inline-start: 0.7rem;
       padding-block: 0.25rem;
@@ -209,4 +256,9 @@ export const StyledSelect = styled.select`
   background-repeat: no-repeat;
   background-position-x: 0;
   background-position-y: 5px;
+`;
+
+export const MulipleSelectionColumn = styled.td`
+  width: 3rem;
+  background-color: transparent;
 `;

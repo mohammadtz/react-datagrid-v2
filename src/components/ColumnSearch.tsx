@@ -1,40 +1,41 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useState, FormEvent } from "react";
 import { HiSearch } from "react-icons/hi";
-import { IColumn, IFilter } from "..";
+import { IColumn, FilterParams } from "..";
 import { renderMessage } from "../localization/render";
 import { getKey } from "../utils/utils";
 import { just_number_regex } from "../utils/variables";
 import { colors } from "../utils/colors";
-import { FilterType } from "./DataGrid.type";
+import { FilterOptions } from "./DataGrid.type";
 import { SelectFilterType } from "./SelectFilterType";
 import { StyledColumnSearch } from "./StyledComponents";
 import { SelectBoolean } from "./SelectBoolean";
 import { useEffect } from "react";
+import { Paths } from "../utils/types";
 
 interface IColumnSearch<T> {
-  column: IColumn<T> | keyof T;
-  onSubmit?: (e?: IFilter<T>) => void;
+  column: IColumn<T> | Paths<T, 2>;
+  onSubmit?: (e?: FilterParams<T>) => void;
   index: number;
-  data?: IFilter<T>;
+  data?: FilterParams<T>;
   message: ReturnType<typeof renderMessage>;
 }
 
 export function ColumnSearch<T>(props: IColumnSearch<T>) {
   const column_obj = props.column as IColumn<T>;
   const [temptValue, setTemptValue] = useState<string | boolean | number | null | undefined>(
-    props.data?.value || ""
+    props.data?.FilterValue || ""
   );
   const [value, setValue] = useState<string | boolean | number | null | undefined>();
-  const [type, setType] = useState<FilterType>(FilterType.contain);
+  const [type, setType] = useState<FilterOptions>(FilterOptions.Contains);
 
   useEffect(() => {
     value !== undefined &&
       props.onSubmit &&
       props.onSubmit({
-        key: getKey(props.column),
-        type,
-        value,
+        ColumnName: getKey(props.column),
+        FilterOptions: type,
+        FilterValue: value,
       });
     setValue(undefined);
   }, [value]);
@@ -46,8 +47,8 @@ export function ColumnSearch<T>(props: IColumnSearch<T>) {
 
   const renderSelectBoolean = () => {
     const selectBooleanValue =
-      props.data?.value === true || props.data?.value === false
-        ? Boolean(props.data?.value)
+      props.data?.FilterValue === true || props.data?.FilterValue === false
+        ? Boolean(props.data?.FilterValue)
         : undefined;
 
     return (

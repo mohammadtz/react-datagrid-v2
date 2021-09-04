@@ -6,4 +6,6 @@ export const colors = {
   gray: "#95a5a6",
   primary: "#028A99",
   secondary: "#03C7C3",
+  rowColor: "#f4f4f4",
+  theadBgColor: "#e1e1e1",
 };

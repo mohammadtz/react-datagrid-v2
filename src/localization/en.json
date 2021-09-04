@@ -1,8 +1,18 @@
 {
-  "select_filter_type_contain": "contain",
-  "select_filter_type_equal": "equal",
-  "select_filter_type_start_with": "start with",
-  "select_filter_type_end_with": "end with",
+  "select_filter_type": {
+    "StartsWith": "starts with",
+    "EndsWith": "ends with",
+    "Contains": "contains",
+    "DoesNotContain": "does not contain",
+    "IsEmpty": "is empty",
+    "IsNotEmpty": "is not empty",
+    "IsGreaterThan": "is greater than",
+    "IsGreaterThanOrEqualTo": "is greater than or equal to",
+    "IsLessThan": "is less than",
+    "IsLessThanOrEqualTo": "is less than or equal to",
+    "IsEqualTo": "is equal to",
+    "IsNotEqualTo  ": "is not equal to"
+  },
   "select_boolean_all": "all",
   "select_boolean_true": "active",
   "select_boolean_false": "inactive"

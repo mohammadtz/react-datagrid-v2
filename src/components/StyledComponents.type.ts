@@ -5,10 +5,6 @@ export interface IDatagridColorSchema {
 }
 
 export interface ITable {
-  visibleBorder?: boolean;
-  visibleRowLines?: boolean;
-  visibleColumnLines?: boolean;
-  rowAlternationEnabled?: boolean;
   sortable?: boolean;
   maxHeight?: string | number;
   height?: string | number;
@@ -16,6 +12,7 @@ export interface ITable {
   hasScrolbar?: boolean;
   selectionMode?: "single" | "multiple";
   colorSchema?: IDatagridColorSchema;
+  columnSearch?: boolean;
 }
 
 export interface ITBody {}

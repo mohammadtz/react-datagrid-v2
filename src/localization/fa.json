@@ -1,8 +1,18 @@
 {
-  "select_filter_type_contain": "شامل",
-  "select_filter_type_equal": "تساوی",
-  "select_filter_type_start_with": "شروع با",
-  "select_filter_type_end_with": "پایان با",
+  "select_filter_type": {
+    "StartsWith": "شروع با",
+    "EndsWith": "پایان با",
+    "Contains": "شامل",
+    "DoesNotContain": "شامل نباشد",
+    "IsEmpty": "خالی باشد",
+    "IsNotEmpty": "خالی نباشد",
+    "IsGreaterThan": "بزرگتر از",
+    "IsGreaterThanOrEqualTo": "بزرگتر یا مساوی",
+    "IsLessThan": "کوچکتر",
+    "IsLessThanOrEqualTo": "کوچکتر یا مساوی",
+    "IsEqualTo": "تساوی",
+    "IsNotEqualTo": "مساوی نباشد"
+  },
   "select_boolean_all": "همه",
   "select_boolean_true": "فعال",
   "select_boolean_false": "غیر فعال"

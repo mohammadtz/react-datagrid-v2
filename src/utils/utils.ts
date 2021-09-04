@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { IColumn } from "..";
 import { op } from "./opacity";
+import { Paths } from "./types";
 
 export function getScrollbarWidth() {
   // Creating invisible container
@@ -28,9 +29,9 @@ export const trueUnit = (value?: string | number): string => {
   return value || "";
 };
 
-export function getKey<T>(column: IColumn<T> | keyof T) {
+export function getKey<T>(column: IColumn<T> | Paths<T, 2>) {
   const column_obj = column as IColumn<T>;
-  const column_key = column as keyof T;
+  const column_key = column as Paths<T, 2>;
   return column_obj.dataField || column_key;
 }
 
@@ -57,6 +58,5 @@ export const checkHasValue = (value: any) => {
 
 export const scrollbarVisible = (element: HTMLElement): boolean => {
   const result = element.scrollHeight > element.clientHeight;
-  console.log("result", result);
   return result;
 };

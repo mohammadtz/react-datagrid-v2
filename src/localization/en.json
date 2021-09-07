@@ -15,5 +15,6 @@
   },
   "select_boolean_all": "all",
   "select_boolean_true": "active",
-  "select_boolean_false": "inactive"
+  "select_boolean_false": "inactive",
+  "advanced_filter_txt": "advanced filter"
 }

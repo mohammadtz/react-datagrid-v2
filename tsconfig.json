@@ -12,7 +12,8 @@
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "typeRoots": ["src/index.d.ts", "node_modules/@types"]
+    "typeRoots": ["src/index.d.ts", "node_modules/@types"],
+    "strict": true
   },
   "include": ["./src/**/*.tsx", "./src/**/*.ts", "src/index.d.ts"],
   "exclude": ["node_modules"]

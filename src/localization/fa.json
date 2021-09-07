@@ -15,5 +15,6 @@
   },
   "select_boolean_all": "همه",
   "select_boolean_true": "فعال",
-  "select_boolean_false": "غیر فعال"
+  "select_boolean_false": "غیر فعال",
+  "advanced_filter_txt": "فیلتر پیشرفته"
 }

@@ -51,6 +51,7 @@ export interface IDataGrid<T = any> extends ITable {
   style?: React.CSSProperties;
   className?: string;
   handleSelectionChanged?: (e: IOnSelectionChanged<T>) => void;
+  handleRowDoubleClick?: (data: T, index: number) => void;
 }
 
 export interface IColumn<T = any> {
@@ -85,9 +86,14 @@ export interface IColumn<T = any> {
 
 export type IElement = "th" | "td";
 
+export enum SortOrders {
+  Asc = 1,
+  Desc = 2,
+}
+
 export interface ISort<T> {
-  key?: Paths<T, 2>;
-  desc?: boolean;
+  ColumnName?: Paths<T, 2>;
+  SortOrder?: SortOrders;
 }
 
 export interface FilterParams<T> {

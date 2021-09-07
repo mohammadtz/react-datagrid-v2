@@ -60,3 +60,14 @@ export const scrollbarVisible = (element: HTMLElement): boolean => {
   const result = element.scrollHeight > element.clientHeight;
   return result;
 };
+
+export const keyify = (obj: any, prefix = ""): string[] => {
+  return Object.keys(obj).reduce<string[]>((res, el) => {
+    if (Array.isArray(obj[el])) {
+      return res;
+    } else if (typeof obj[el] === "object" && obj[el] !== null) {
+      return [...res, ...keyify(obj[el], prefix + el + ".")];
+    }
+    return [...res, prefix + el];
+  }, []);
+};

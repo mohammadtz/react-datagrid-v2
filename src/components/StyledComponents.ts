@@ -6,6 +6,7 @@ import { ITable } from "./StyledComponents.type";
 export const main_border = `1px solid ${colors.border}`;
 export const selectedBorder = `1px solid ${colors.secondary}`;
 export const selectRowSize = "1px";
+export const multipleSelectionColumnWidth = "3rem";
 
 export const borderRadiusRow = (isEnd?: boolean) => {
   let value = "0 4px 4px 0";
@@ -21,13 +22,6 @@ export const StyledTable = styled.table<ITable>`
   height: ${(props) => trueUnit(props.height)};
   transition: 0.3s all;
   border-collapse: collapse;
-
-  thead tr,
-  tbody tr {
-    display: table;
-    width: 100%;
-    table-layout: fixed;
-  }
 
   tbody tr {
     cursor: ${(props) => (props.selectionMode === "single" ? "pointer" : undefined)};
@@ -102,6 +96,18 @@ export const StyledTable = styled.table<ITable>`
     }
   }
 
+  tfoot {
+    width: ${(props) =>
+      (props.maxHeight || props.height) && props.hasScrolbar
+        ? `calc(100% - ${`${getScrollbarWidth()}px`})`
+        : "100%"};
+    margin-top: 8px;
+    display: block;
+    tr {
+      height: 3rem;
+    }
+  }
+
   .td-inner {
     height: 100%;
     background-color: ${colors.rowColor};
@@ -141,6 +147,9 @@ export const StyledTable = styled.table<ITable>`
   }
 
   tr {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
     td,
     th {
       :last-child {
@@ -259,6 +268,28 @@ export const StyledSelect = styled.select`
 `;
 
 export const MulipleSelectionColumn = styled.td`
-  width: 3rem;
+  width: ${multipleSelectionColumnWidth};
   background-color: transparent;
+`;
+
+export const AdvancedFilter = styled.tr`
+  .main-column {
+    background-color: ${colors.theadBgColor};
+    border-radius: 4px !important;
+    padding-inline-start: 1rem;
+    button {
+      background-color: transparent;
+      border: none;
+      cursor: pointer;
+      text-decoration: underline;
+      color: ${colors.primary};
+      display: flex;
+      align-items: center;
+      font-weight: 500;
+      font-size: 1rem;
+      span {
+        padding-inline-start: 0.2rem;
+      }
+    }
+  }
 `;

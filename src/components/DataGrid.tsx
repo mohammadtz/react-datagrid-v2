@@ -3,12 +3,13 @@ import React, { ReactNode, useState, useEffect, useRef } from "react";
 import { IDataGrid, IElement, IColumn, ISort, FilterParams } from "./DataGrid.type";
 import { HiOutlineArrowNarrowDown, HiOutlineArrowNarrowUp } from "react-icons/hi";
 import { v4 as uuidv4 } from "uuid";
-import { main_border, MulipleSelectionColumn, StyledTable } from "./StyledComponents";
+import * as S from "./StyledComponents";
 import { ColumnSearch } from "./ColumnSearch";
-import { checkHasValue, getKey, scrollbarVisible } from "../utils/utils";
+import { checkHasValue, getKey, keyify, scrollbarVisible } from "../utils/utils";
 import { renderMessage } from "../localization/render";
 import { Paths } from "../utils/types";
 import { get } from "lodash";
+import { SortOrders } from "..";
 
 const defaultProps: IDataGrid = { colorSchema: { primary: "#03C7C3" } };
 
@@ -53,12 +54,16 @@ export function DataGrid<T = any>(props: IDataGrid<T> = defaultProps) {
 
   /** declare columnBySort */
   const renderColBySort = (key: Paths<T, 2>, children: ReactNode) => {
-    const showSort = sort?.key === key && sort.desc !== undefined ? "show-sort" : "";
+    const showSort = sort?.ColumnName === key && sort.SortOrder !== undefined ? "show-sort" : "";
 
-    const icon = sort?.desc ? HiOutlineArrowNarrowDown : HiOutlineArrowNarrowUp;
+    const icon = sort?.SortOrder ? HiOutlineArrowNarrowDown : HiOutlineArrowNarrowUp;
     const renderSortIcon = React.createElement(icon, { className: "sort-icon" });
 
-    const handleSort = () => setSort({ key, desc: !sort?.desc });
+    const handleSort = () =>
+      setSort({
+        ColumnName: key,
+        SortOrder: sort?.SortOrder === SortOrders.Asc ? SortOrders.Desc : SortOrders.Asc,
+      });
 
     return (
       <div className={`show-sort`} key={uuidv4()} onClick={handleSort}>
@@ -101,7 +106,7 @@ export function DataGrid<T = any>(props: IDataGrid<T> = defaultProps) {
       } else result = renderTdInner(renderWithBorder(get(data, key)));
       /** */
     } else {
-      const children = col_obj?.caption || col_obj?.dataField || col_key;
+      const children = col_obj?.caption || key;
       if (props.sortable && col_obj?.dataField) result = renderColBySort(key, children);
       else result = renderWithBorder(children);
     }
@@ -134,9 +139,9 @@ export function DataGrid<T = any>(props: IDataGrid<T> = defaultProps) {
 
     return (
       props.selectionMode === "multiple" && (
-        <MulipleSelectionColumn>
+        <S.MulipleSelectionColumn>
           {inputRender && <input type="checkbox" checked={checked} onChange={(e) => onChange()} />}
-        </MulipleSelectionColumn>
+        </S.MulipleSelectionColumn>
       )
     );
   };
@@ -176,8 +181,18 @@ export function DataGrid<T = any>(props: IDataGrid<T> = defaultProps) {
       if (selectedRows.includes(props.dataSource[index])) selectRowStyle = "selected-border";
     }
 
+    const onDoubleClick = () => {
+      if (props.handleRowDoubleClick && props.dataSource)
+        props.handleRowDoubleClick(props.dataSource[index], index);
+    };
+
     return (
-      <tr key={uuidv4()} onClick={() => onRowClick(index)} className={selectRowStyle}>
+      <tr
+        key={uuidv4()}
+        onClick={() => onRowClick(index)}
+        onDoubleClick={onDoubleClick}
+        className={selectRowStyle}
+      >
         {renderMultipleSelection(true, index)}
         {columns("td", true, index)}
       </tr>
@@ -189,26 +204,18 @@ export function DataGrid<T = any>(props: IDataGrid<T> = defaultProps) {
 
   /** render all columns in data-grid */
   const columns = (element: IElement, renderData: boolean, index: number = 0) => {
-    const renderWithColumn = props.columns?.map((column, i) => {
-      return renderColumn(element, column, index !== undefined ? index : i, renderData);
-    });
+    const renderWithColumn = props.columns?.map((column, i) =>
+      renderColumn(element, column, index !== undefined ? index : i, renderData)
+    );
 
     const renderWithoutColumn =
       props.dataSource &&
-      Object.keys(props.dataSource[index]).map((key, i) => {
-        return renderColumn(
-          element,
-          key as Paths<T, 2>,
-          index !== undefined ? index : i,
-          renderData
-        );
-      });
+      props.dataSource.length > 0 &&
+      keyify(props.dataSource[index]).map((key, i) =>
+        renderColumn(element, key as Paths<T, 2>, index !== undefined ? index : i, renderData)
+      );
 
     return props.columns ? renderWithColumn : renderWithoutColumn;
-  };
-
-  const renderSummary = () => {
-    return <></>;
   };
 
   const handleFilterChange = (e?: FilterParams<T>) => {
@@ -224,10 +231,10 @@ export function DataGrid<T = any>(props: IDataGrid<T> = defaultProps) {
     setFilters(temp);
   };
 
-  const renderColumnsSearch = props.columns?.map((column, index) => {
+  function innerColumnSearch(column: IColumn<T> | Paths<T, 2>, index: number) {
     const col_obj = column as IColumn<T> | undefined;
     const borderInlineEnd =
-      props.columns && index === props.columns.length - 1 ? undefined : main_border;
+      props.columns && index === props.columns.length - 1 ? undefined : S.main_border;
 
     return typeof getKey(column) === "string" ? (
       <td key={uuidv4()} style={{ width: col_obj?.width }}>
@@ -244,7 +251,16 @@ export function DataGrid<T = any>(props: IDataGrid<T> = defaultProps) {
         <form style={{ height: 31, borderInlineEnd }} />
       </td>
     );
-  });
+  }
+
+  const renderColumnsSearch = () => {
+    if (props.columns && props.columns.length > 0) return props.columns?.map(innerColumnSearch);
+    else if (props.dataSource && props.dataSource.length > 0) {
+      const columns = keyify(props.dataSource[0]) as Paths<T, 2>[];
+      return columns.map(innerColumnSearch);
+    }
+    return null;
+  };
 
   const scroll = () => {
     const tbody = tbodyRef.current;
@@ -253,8 +269,22 @@ export function DataGrid<T = any>(props: IDataGrid<T> = defaultProps) {
       props.scrolledToBottom && props.scrolledToBottom();
   };
 
+  // const renderAdvancedFilter = () => {
+  //   return (
+  //     <S.AdvancedFilter>
+  //       {props.selectionMode === "multiple" && renderMultipleSelection(false, -2)}
+  //       <td className="main-column">
+  //         <button>
+  //           <HiOutlineFilter color={colors.primary} />
+  //           <span>{message.advanced_filter_txt}</span>
+  //         </button>
+  //       </td>
+  //     </S.AdvancedFilter>
+  //   );
+  // };
+
   return (
-    <StyledTable {...props} hasScrolbar={visibleScrollbar}>
+    <S.StyledTable {...props} hasScrolbar={visibleScrollbar}>
       <thead>
         <tr>
           {renderMultipleSelection(true, -1)}
@@ -263,13 +293,13 @@ export function DataGrid<T = any>(props: IDataGrid<T> = defaultProps) {
         {props.columnSearch && (
           <tr className="column-search">
             {renderMultipleSelection(false, -2)}
-            {renderColumnsSearch}
+            {renderColumnsSearch()}
           </tr>
         )}
       </thead>
       <tbody ref={tbodyRef}>{rows()}</tbody>
-      <tfoot>{renderSummary()}</tfoot>
-    </StyledTable>
+      {/* <tfoot>{renderAdvancedFilter()}</tfoot> */}
+    </S.StyledTable>
   );
 }
 
